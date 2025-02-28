@@ -1,0 +1,203 @@
+/* Global Reset for all pages */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Wrapper for Navbar and Header */
+.navbar-wrapper {
+    width: 100%;
+}
+
+/* Header Section */
+.navbar-wrapper .header {
+    background-color: #343a40;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.navbar-wrapper .header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+/* Navbar Styles */
+.navbar-wrapper .navbar {
+    background-color: #343a40;
+    padding: 0.5rem 1rem;
+    position: relative;
+    z-index: 10;
+}
+
+/* Navbar Branding */
+.navbar-wrapper .navbar-brand {
+    font-size: 1.75rem;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+}
+
+/* Navbar Toggle Button */
+.navbar-wrapper .navbar-toggler {
+    border: none;
+    background-color: transparent;
+}
+
+.navbar-wrapper .navbar-toggler-icon {
+    background-color: white;
+}
+
+/* Navbar Nav Items */
+.navbar-wrapper .navbar-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.navbar-wrapper .nav-item {
+    margin-left: 20px;
+}
+
+.navbar-wrapper .nav-link {
+    color: white;
+    font-size: 1rem;
+    text-transform: uppercase;
+    padding: 10px 15px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.navbar-wrapper .nav-link:hover {
+    background-color: #ff6f61;
+    border-radius: 5px;
+}
+
+/* Right-aligned Profile Section */
+.navbar-wrapper .navbar-nav.ms-auto {
+    margin-left: auto !important;
+}
+
+/* Profile Management */
+.navbar-wrapper .dropdown-menu {
+    min-width: 180px;
+    background-color: #343a40;
+    border-radius: 5px;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: none; /* Initially hide the dropdown */
+    position: absolute;
+    z-index: 1000;
+}
+
+.navbar-wrapper .dropdown-item {
+    color: white;
+    font-size: 1rem;
+    padding: 10px 15px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.navbar-wrapper .dropdown-item:hover {
+    background-color: #ff6f61;
+    border-radius: 5px;
+}
+
+.navbar-wrapper .nav-link.dropdown-toggle {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+}
+
+.navbar-wrapper .nav-link img {
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.navbar-wrapper .dropdown-menu .dropdown-item:last-child {
+    border-top: 1px solid #ddd;
+}
+
+/* Desktop View - Navbar with Hover Dropdown */
+@media (min-width: 992px) {
+    /* Ensure dropdown displays on hover for desktop */
+    .navbar-wrapper .nav-item.dropdown:hover .dropdown-menu {
+        display: block;
+    }
+
+    .navbar-wrapper .nav-item.dropdown .dropdown-menu {
+        display: none;
+    }
+}
+
+/* Mobile View - Navbar Toggle */
+@media (max-width: 991px) {
+    .navbar-wrapper .navbar-nav {
+        flex-direction: column;
+        background-color: #343a40;
+        width: 100%;
+    }
+
+    .navbar-wrapper .nav-item {
+        margin: 10px 0;
+        text-align: center;
+    }
+
+    .navbar-wrapper .navbar-toggler {
+        position: relative;
+    }
+
+    .navbar-wrapper .search-bar {
+        margin-top: 10px;
+        width: 100%;
+        padding: 10px;
+    }
+
+    .navbar-wrapper .search-bar input {
+        width: 100%;
+    }
+
+    .navbar-wrapper .search-bar button {
+        width: auto;
+    }
+
+    /* Ensure dropdown shows when clicked (for mobile) */
+    .navbar-wrapper .nav-item.dropdown.show .dropdown-menu {
+        display: block;
+    }
+
+    .navbar-wrapper .nav-item.dropdown:hover .dropdown-menu {
+        display: block;
+    }
+
+    .navbar-wrapper .nav-item.dropdown .dropdown-menu {
+        display: none;
+    }
+}
+
+/* Reset Navbar Toggler Icon */
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=UTF8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba%28255, 255, 255, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100%;
+}
+
+/* Optional: Make Toggler Icon visible on dark backgrounds */
+.navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.5);
+}
