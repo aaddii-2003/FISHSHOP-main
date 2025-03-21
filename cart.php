@@ -18,55 +18,61 @@ if (isset($_POST['action'])) {
             $_SESSION['cart'] = [];
         }
 
-        // Add the book to the cart (if not already in the cart)
-        if (!in_array($itemid, $_SESSION['cart'])) {
-            $_SESSION['cart'][] = $itemid;
+        // Add or update the item quantity in cart
+        if (!isset($_SESSION['cart'][$itemid])) {
+            $_SESSION['cart'][$itemid] = 1;
             $_SESSION['message'] = "Item added to cart successfully!";
         } else {
-            $_SESSION['message']="This Item is already in your cart!";
+            $_SESSION['cart'][$itemid]++;
+            $_SESSION['message'] = "Item quantity updated in cart!";
         }
     }
 
     if ($action == 'remove') {
-        // Remove book from the cart
-        if (($key = array_search($itemid, $_SESSION['cart'])) !== false) {
-            unset($_SESSION['cart'][$key]);
+        // Remove item from the cart
+        if (isset($_SESSION['cart'][$itemid])) {
+            unset($_SESSION['cart'][$itemid]);
             $_SESSION['message'] = "Item removed from cart successfully!";
         }
     }
 
     if ($action == 'buy') {
-        // Add the book to the orders session for 'Buy Now'
-        if (!isset($_SESSION['orders'])) {
-            $_SESSION['orders'] = [];
-        }
+        // Set up direct purchase session variables
+        $_SESSION['orders'] = [$itemid];
+        $_SESSION['direct_purchase'] = true;
 
-        if (!in_array($itemid, $_SESSION['orders'])) {
-            $_SESSION['orders'][] = $itemid;
-        }
-
-        // Redirect to the order page after adding the book to the orders
+        // Redirect to the order page for direct purchase
         header("Location: order.php");
         exit();
+    }
+}
+
+// Handle quantity updates
+if (isset($_POST['action']) && $_POST['action'] == 'update_quantity') {
+    $itemid = $_POST['id'];
+    $quantity = max(1, min(10, intval($_POST['quantity'])));
+    
+    if (isset($_SESSION['cart'][$itemid])) {
+        $_SESSION['cart'][$itemid] = $quantity;
+        $_SESSION['message'] = "Quantity updated successfully!";
     }
 }
 
 // Handle "Proceed to Order" logic for moving items from cart to orders
 if (isset($_POST['action']) && $_POST['action'] == 'proceed_to_order') {
     if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
-        // Add all cart items to orders session
+        // Add all cart items to orders session with their quantities
         if (!isset($_SESSION['orders'])) {
             $_SESSION['orders'] = [];
         }
 
-        foreach ($_SESSION['cart'] as $itemid) {
-            if (!in_array($itemid, $_SESSION['orders'])) {
-                $_SESSION['orders'][] = $itemid;
-            }
+        foreach ($_SESSION['cart'] as $itemid => $quantity) {
+            $_SESSION['orders'][$itemid] = $quantity;
         }
 
         // Clear the cart after transferring the items
         unset($_SESSION['cart']);
+        $_SESSION['direct_purchase'] = false;
 
         // Redirect to the order page
         header("Location: order.php");
@@ -77,11 +83,12 @@ if (isset($_POST['action']) && $_POST['action'] == 'proceed_to_order') {
 // Fetch cart items
 $cart_items = [];
 if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
-    $itemids = implode(',', $_SESSION['cart']);
+    $itemids = implode(',', array_keys($_SESSION['cart']));
     $sql = "SELECT * FROM fishitem WHERE id IN ($itemids)";
     $result = $conn->query($sql);
 
     while ($row = $result->fetch_assoc()) {
+        $row['quantity'] = $_SESSION['cart'][$row['id']];
         $cart_items[] = $row;
     }
 }
@@ -116,6 +123,8 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                             <th>Title</th>
                             <th>Seller Name</th>
                             <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Subtotal</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -123,12 +132,23 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                         <?php
                         $total_price = 0;
                         foreach ($cart_items as $item):
-                            $total_price += $item['price'];
+                            $subtotal = $item['price'] * $item['quantity'];
+                            $total_price += $subtotal;
                         ?>
                             <tr>
                                 <td><?php echo $item['title']; ?></td>
                                 <td><?php echo $item['seller_name']; ?></td>
                                 <td>Rs. <?php echo $item['price']; ?></td>
+                                <td>
+                                    <form method="POST" action="cart.php" class="d-flex align-items-center">
+                                        <input type="hidden" name="action" value="update_quantity">
+                                        <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
+                                        <input type="number" name="quantity" value="<?php echo $item['quantity']; ?>" 
+                                               min="1" max="10" class="form-control form-control-sm" style="width: 70px;"
+                                               onchange="this.form.submit()">
+                                    </form>
+                                </td>
+                                <td>Rs. <?php echo $subtotal; ?></td>
                                 <td>
                                     <!-- Remove Button -->
                                     <form method="POST" action="cart.php" style="display:inline;">
@@ -158,7 +178,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                 </div>
             </div>
         <?php else: ?>
-            <p>Your cart is empty! <a href="fishingitem.php">Browse Item</a> and add some.</p>
+            <p>Your cart is empty! <a href="index.php">Browse Item</a> and add some.</p>
         <?php endif; ?>
     </div>
 

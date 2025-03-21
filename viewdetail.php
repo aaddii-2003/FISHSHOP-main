@@ -62,7 +62,11 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
                         <input type="hidden" name="action" value="add">
                         <button type="submit" class="btn btn-success btn-lg">Add to Cart</button>
                     </form>
-                    <a href="cart.php?action=buy&id=<?php echo $fishingitem['id']; ?>" class="btn btn-primary btn-lg">Buy Now</a>
+                    <form method="POST" action="cart.php" style="display: inline;">
+                        <input type="hidden" name="id" value="<?php echo $fishingitem['id']; ?>">
+                        <input type="hidden" name="action" value="buy">
+                        <button type="submit" class="btn btn-primary btn-lg">Buy Now</button>
+                    </form>
                 </div>
             </div>
         </div>
