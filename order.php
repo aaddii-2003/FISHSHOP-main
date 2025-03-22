@@ -310,9 +310,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['cancel_order'])) {
                         <option value="card">Credit/Debit Card</option>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary">Place Order</button>
+                <button class="btn btn-primary" onclick="buyNow(${item.id}, ${item.price})">Buy Now</button>
                 <button type="submit" name="cancel_order" class="btn btn-danger">Cancel Order</button>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+    function buyNow(itemId, price) {
+        fetch('checkout.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                id: itemId,
+                price: price
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.url) {
+                window.location.href = data.url; // Redirect to Stripe checkout
+            } else {
+                alert('Error: ' + (data.error || 'Unknown error occurred'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Something went wrong!');
+        });
+    }
+</script>

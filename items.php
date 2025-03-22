@@ -28,7 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <p class="item-description">${item.description}</p>
                                 <div class="item-meta">
                                     <div class="item-price">₹${parseFloat(item.price).toFixed(2)}</div>
-                                    
                                 </div>
                                 <div class="item-actions">
                                     <form method="POST" action="cart.php" class="d-inline">
@@ -36,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <input type="hidden" name="action" value="add">
                                         <button type="submit" class="btn btn-success">Add to Cart</button>
                                     </form>
-                                    <a href="cart.php?action=buy&id=${item.id}" class="btn btn-primary">Buy Now</a>
+                                    <button class="btn btn-primary" onclick="buyNow(${item.id}, ${item.price})">Buy Now</button>
                                 </div>
                             </div>
                         </div>
@@ -82,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (endPage < pagination.total_pages) {
-            paginationHTML += `${endPage < pagination.total_pages - 1 ? '<span class="pagination-ellipsis">...</span>' : ''}
+            paginationHTML += `${endPage < pagination.total_pages - 1 ? '<span class="pagination-ellipsis">...</span>' : ''} 
             <button class="pagination-btn" onclick="loadItems(${pagination.total_pages})">${pagination.total_pages}</button>`;
         }
 
@@ -101,7 +100,33 @@ document.addEventListener('DOMContentLoaded', function() {
         history.pushState({ page: page }, '', newURL);
     }
 
+    function buyNow(itemId, price) {
+        fetch('checkout.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                id: itemId,
+                price: price
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.url) {
+                window.location.href = data.url; // Redirect to Stripe checkout
+            } else {
+                alert('Error: ' + (data.error || 'Unknown error occurred'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Something went wrong!');
+        });
+    }
+
     window.loadItems = loadItems;
+    window.buyNow = buyNow;
 
     loadItems(currentPage);
 });
@@ -137,4 +162,4 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 
-    <?php include('footer.php'); ?>
+    <?php include('footer.php'); ?> 
